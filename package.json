@@ -1,0 +1,14 @@
+{
+  "name": "Backup-Server",
+  "description": "Backup server for minecraft worlds",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "adm-zip": "^0.4.4",
+    "app-config": "^0.1.4",
+    "azure-storage": "^0.3.3",
+    "express": "^4.8.5",
+    "moment": "^2.8.1",
+    "underscore": "^1.6.0"
+  }
+}
