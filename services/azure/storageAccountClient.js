@@ -4,12 +4,6 @@ module.exports = function(accountName, accountKey) {
 
 	var blobService = azureStorage.createBlobService(accountName, accountKey);
 
-	function assertContainer(containerName, callback) {
-		blobService.createContainerIfNotExists(containerName, function (error, result, response) {
-			callback(error, result, response);
-		});
-	};
-
 	return {
 
 		listBlobs: function(containerName, callback) {
@@ -31,15 +25,21 @@ module.exports = function(accountName, accountKey) {
 		},
 
 		addBlob: function(containerName, blobName, sourceFolder, callback) {
-			blobService.createContainerIfNotExists(containerName, function (error, result, response) {
+			var createBlockBlobFromLocalFileCallbackHandler = function (error, result, response) {
+				callback(error, result, response);
+			};
+
+			var createContainerIfNotExistsCallbackHandler = function (error, result, response) {
 				if (response.isSuccessful) {
-					blobService.createBlockBlobFromLocalFile(containerName, blobName, sourceFolder + '/' + blobName, function (error, result, response) {
-						callback(error, result, response);
-					});
-				} else {
-					callback(error, result, response);
+					blobService.createBlockBlobFromLocalFile(containerName, blobName, sourceFolder + '/' + blobName, createBlockBlobFromLocalFileCallbackHandler);
+
+					return;
 				}
-			});
+
+				callback(error, result, response);
+			};
+
+			blobService.createContainerIfNotExists(containerName, createContainerIfNotExistsCallbackHandler);
 		},
 
 		deleteBlob: function() {

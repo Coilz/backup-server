@@ -26,9 +26,10 @@ var create = function(req, res, next) {
 	client.addBlob(storageConfig.container, blobName, tmpFolder, function(error, result, response) {
 		if (error){
 			res.send(error);
-		} else {
-			res.send(sourceConfig.folder + ' saved to ' + blobName);
+			return;
 		}
+
+		res.send(sourceConfig.folder + ' saved to ' + blobName);
 	});
 };
 
