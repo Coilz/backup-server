@@ -7,6 +7,6 @@
 *.gz
 .DS_Store
 
-node_modules
-temp
-dev
+node_modules/
+temp/
+dev/
