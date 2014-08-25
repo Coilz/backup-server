@@ -24,14 +24,14 @@ module.exports = function(accountName, accountKey) {
 			});
 		},
 
-		addBlob: function(containerName, blobName, sourceFolder, callback) {
+		addBlob: function(containerName, blobName, filePath, callback) {
 			var createBlockBlobFromLocalFileCallbackHandler = function (error, result, response) {
 				callback(error, result, response);
 			};
 
 			var createContainerIfNotExistsCallbackHandler = function (error, result, response) {
 				if (response.isSuccessful) {
-					blobService.createBlockBlobFromLocalFile(containerName, blobName, sourceFolder + '/' + blobName, createBlockBlobFromLocalFileCallbackHandler);
+					blobService.createBlockBlobFromLocalFile(containerName, blobName, filePath, createBlockBlobFromLocalFileCallbackHandler);
 
 					return;
 				}

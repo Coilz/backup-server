@@ -1,33 +1,9 @@
 var storageClient = require('../services/azure/storageAccountClient');
+var folderZip = require('../services/folderZip');
 
 var config = require('app-config');
 var storageConfig = config.azure.storageAccount;
 var sourceConfig = config.dataSource;
-
-function zipFolder(sourceFolder, destinationFolder, callback) {
-	var zip = require('adm-zip');
-	var moment = require('moment');
-	
-	var blobName = moment().format('YYYYMMDD-HHmmss') + '.zip';
-	var backupFilePath = destinationFolder + '/' + blobName;
-
-	try {
-		var zipper = new zip();
-		zipper.addLocalFolder(sourceFolder, destinationFolder);
-		zipper.writeZip(backupFilePath);
-	} catch (ex) {
-		callback(ex);
-		return;
-	}
-
-	var result = {
-		blobName: blobName,
-		backupFilePath: backupFilePath,
-		destinationFolder: destinationFolder
-	};
-
-	callback(null, result);
-};
 
 var list = function(req, res, next) {
 };
@@ -37,6 +13,7 @@ var get = function(req, res, next) {
 
 var create = function(req, res, next) {
 	var moment = require('moment');
+	var blobName = moment().format('YYYYMMDD-HHmmss');
 
 	var addBlobCallbackHandler = function(error, addBlobResult, response) {
 		if (error){
@@ -44,6 +21,7 @@ var create = function(req, res, next) {
 			return;
 		}
 
+		// TODO: remove the zip-file or create backup in memory
 		res.send(addBlobResult);
 	};
 
@@ -54,11 +32,10 @@ var create = function(req, res, next) {
 		}
 
 		var client = new storageClient(storageConfig.name, storageConfig.key);
-
-		client.addBlob(storageConfig.container, zipResult.blobName, zipResult.destinationFolder, addBlobCallbackHandler);
+		client.addBlob(storageConfig.container, blobName, zipResult.backupFilePath, addBlobCallbackHandler);
 	};
 
-	zipFolder(sourceConfig.folder, './temp', zipFolderCallbackHandler);
+	folderZip.zipToFile(sourceConfig.folder, './temp', blobName, zipFolderCallbackHandler);
 };
 
 var get = function(req, res, next) {
