@@ -1,8 +1,9 @@
 var zip = require('adm-zip');
+var path = require('path');
 
 module.exports = {
 	zipToFile : function(sourceFolder, destinationFolder, blobName, callback) {
-		var backupFilePath = destinationFolder + '/' + blobName + '.zip';
+		var backupFilePath = path.join(destinationFolder, blobName + '.zip');
 
 		try {
 			var zipper = new zip();

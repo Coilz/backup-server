@@ -24,14 +24,37 @@ module.exports = function(accountName, accountKey) {
 			});
 		},
 
-		addBlob: function(containerName, blobName, filePath, callback) {
-			var createBlockBlobFromLocalFileCallbackHandler = function (error, result, response) {
+		addBlobFromLocalFile: function(containerName, blobName, filePath, callback) {
+			var createBlobCallbackHandler = function (error, result, response) {
 				callback(error, result, response);
 			};
 
 			var createContainerIfNotExistsCallbackHandler = function (error, result, response) {
 				if (response.isSuccessful) {
-					blobService.createBlockBlobFromLocalFile(containerName, blobName, filePath, createBlockBlobFromLocalFileCallbackHandler);
+					blobService.createBlockBlobFromLocalFile(containerName, blobName, filePath, createBlobCallbackHandler);
+
+					return;
+				}
+
+				callback(error, result, response);
+			};
+
+			blobService.createContainerIfNotExists(containerName, createContainerIfNotExistsCallbackHandler);
+		},
+
+		addBlobFromBuffer: function(containerName, blobName, buffer, callback) {
+			var createBlobCallbackHandler = function (error, result, response) {
+				callback(error, result, response);
+			};
+
+			var createContainerIfNotExistsCallbackHandler = function (error, result, response) {
+				var streamBuffers = require("stream-buffers");
+
+				if (response.isSuccessful) {
+					var streamBuffer = new streamBuffers.ReadableStreamBuffer();
+					streamBuffer.put(buffer);
+					
+					blobService.createBlockBlobFromStream(containerName, blobName, streamBuffer, buffer.length, createBlobCallbackHandler);
 
 					return;
 				}

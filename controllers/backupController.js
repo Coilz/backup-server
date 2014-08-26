@@ -1,5 +1,6 @@
 var storageClient = require('../services/azure/storageAccountClient');
 var folderZip = require('../services/folderZip');
+var path = require('path');
 
 var config = require('app-config');
 var storageConfig = config.azure.storageAccount;
@@ -21,7 +22,6 @@ var create = function(req, res, next) {
 			return;
 		}
 
-		// TODO: remove the zip-file or create backup in memory
 		res.send(addBlobResult);
 	};
 
@@ -32,10 +32,10 @@ var create = function(req, res, next) {
 		}
 
 		var client = new storageClient(storageConfig.name, storageConfig.key);
-		client.addBlob(storageConfig.container, blobName, zipResult.backupFilePath, addBlobCallbackHandler);
+		client.addBlobFromBuffer(storageConfig.container, blobName + '.zip', zipResult.buffer, addBlobCallbackHandler);
 	};
 
-	folderZip.zipToFile(sourceConfig.folder, './temp', blobName, zipFolderCallbackHandler);
+	folderZip.zipToBuffer(sourceConfig.folder, blobName, zipFolderCallbackHandler);
 };
 
 var get = function(req, res, next) {
@@ -48,5 +48,6 @@ module.exports = {
 	list : create,
 	get : get,
 	create : create,
+	createLocal : createLocal,
 	delete : remove
 };
