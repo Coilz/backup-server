@@ -48,6 +48,5 @@ module.exports = {
 	list : create,
 	get : get,
 	create : create,
-	createLocal : createLocal,
 	delete : remove
 };
