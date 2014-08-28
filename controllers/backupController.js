@@ -22,6 +22,7 @@ var create = function(req, res, next) {
 			return;
 		}
 
+		// TODO: remove the zip-file or create backup in memory
 		res.send(addBlobResult);
 	};
 
@@ -32,9 +33,11 @@ var create = function(req, res, next) {
 		}
 
 		var client = new storageClient(storageConfig.name, storageConfig.key);
+		// client.addBlobFromLocalFile(storageConfig.container, blobName + '.zip', zipResult.backupFilePath, addBlobCallbackHandler);
 		client.addBlobFromBuffer(storageConfig.container, blobName + '.zip', zipResult.buffer, addBlobCallbackHandler);
 	};
 
+	// folderZip.zipToFile(sourceConfig.folder, './temp', blobName, zipFolderCallbackHandler);
 	folderZip.zipToBuffer(sourceConfig.folder, blobName, zipFolderCallbackHandler);
 };
 

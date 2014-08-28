@@ -25,6 +25,8 @@ module.exports = function(accountName, accountKey) {
 		},
 
 		addBlobFromLocalFile: function(containerName, blobName, filePath, callback) {
+			console.log('storageAccountClient.addBlobFromLocalFile call');
+
 			var createBlobCallbackHandler = function (error, result, response) {
 				callback(error, result, response);
 			};
@@ -43,6 +45,8 @@ module.exports = function(accountName, accountKey) {
 		},
 
 		addBlobFromBuffer: function(containerName, blobName, buffer, callback) {
+			console.log('storageAccountClient.addBlobFromBuffer call');
+
 			var createBlobCallbackHandler = function (error, result, response) {
 				callback(error, result, response);
 			};
@@ -51,10 +55,15 @@ module.exports = function(accountName, accountKey) {
 				var streamBuffers = require("stream-buffers");
 
 				if (response.isSuccessful) {
-					var streamBuffer = new streamBuffers.ReadableStreamBuffer();
+					console.log('storageAccountClient.addBlobFromBuffer streamBuffer');
+
+					var streamBuffer = new streamBuffers.ReadableStreamBuffer({
+					    frequency: 1,			// in milliseconds.
+					    chunkSize: 1024*1024*32	// in bytes.
+					});
 					streamBuffer.put(buffer);
-					
-					blobService.createBlockBlobFromStream(containerName, blobName, streamBuffer, buffer.length, createBlobCallbackHandler);
+
+					blobService.createBlockBlobFromStream(containerName, blobName, streamBuffer, streamBuffer.size(), createBlobCallbackHandler);
 
 					return;
 				}

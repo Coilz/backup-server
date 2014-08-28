@@ -5,6 +5,8 @@ module.exports = {
 	zipToFile : function(sourceFolder, destinationFolder, blobName, callback) {
 		var backupFilePath = path.join(destinationFolder, blobName + '.zip');
 
+		console.log('folderZip.zipToFile call');
+
 		try {
 			var zipper = new zip();
 			zipper.addLocalFolder(sourceFolder, blobName);
@@ -23,6 +25,8 @@ module.exports = {
 	
 	zipToBuffer : function(sourceFolder, blobName, callback) {
 		var buffer;
+
+		console.log('folderZip.zipToBuffer call');
 
 		try {
 			var zipper = new zip();
