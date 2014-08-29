@@ -31,7 +31,7 @@ var create = function(req, res, next) {
 			return;
 		}
 
-		removeFile(addBlobResult.filePath);
+//		removeFile(addBlobResult.filePath);
 		res.send(addBlobResult);
 	};
 
