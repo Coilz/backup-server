@@ -25,35 +25,18 @@ module.exports = function(accountName, accountKey) {
 		},
 
 		addBlobFromLocalFile: function(containerName, blobName, filePath, callback) {
-			var createBlobCallbackHandler = function (error, result, response) {
+			function createBlobCallbackHandler(error, result, response) {
 				result.filePath = filePath;
 				callback(error, result, response);
 			};
 
-			var createContainerIfNotExistsCallbackHandler = function (error, result, response) {
-				if (response.isSuccessful) {
-					blobService.createBlockBlobFromLocalFile(containerName, blobName, filePath, createBlobCallbackHandler);
+			function createContainerIfNotExistsCallbackHandler(error, result, response) {
+				if (error) {
+					callback(error);
 					return;
 				}
 
-				callback(error, result, response);
-			};
-
-			blobService.createContainerIfNotExists(containerName, createContainerIfNotExistsCallbackHandler);
-		},
-
-		addBlobFromStream: function(containerName, blobName, stream, callback) {
-			var createBlobCallbackHandler = function (error, result, response) {
-				callback(error, result, response);
-			};
-
-			var createContainerIfNotExistsCallbackHandler = function (error, result, response) {
-				if (response.isSuccessful) {
-					blobService.createBlockBlobFromStream(containerName, blobName, stream, stream.size(), createBlobCallbackHandler);
-					return;
-				}
-
-				callback(error, result, response);
+				blobService.createBlockBlobFromLocalFile(containerName, blobName, filePath, createBlobCallbackHandler);
 			};
 
 			blobService.createContainerIfNotExists(containerName, createContainerIfNotExistsCallbackHandler);

@@ -25,17 +25,17 @@ var create = function(req, res, next) {
 	var moment = require('moment');
 	var blobName = moment().format('YYYYMMDD-HHmmss');
 
-	var addBlobCallbackHandler = function(error, addBlobResult, response) {
+	function addBlobCallbackHandler(error, addBlobResult, response) {
 		if (error){
 			res.send('Add blob error: ' + error);
 			return;
 		}
 
-//		removeFile(addBlobResult.filePath);
+		removeFile(addBlobResult.filePath);
 		res.send(addBlobResult);
 	};
 
-	var zipFolderCallbackHandler = function(error, zipResult) {
+	function zipFolderCallbackHandler(error, zipResult) {
 		if (error) {
 			res.send('Zip error: ' + error);
 			return;

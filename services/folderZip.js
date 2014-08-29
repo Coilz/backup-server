@@ -1,12 +1,16 @@
 var archiver = require('archiver');
+var fs = require('fs');
 var path = require('path');
 
 module.exports = {
 	zipToFile : function(sourceFolder, destinationFolder, blobName, callback) {
-		var file_system = require('fs');
+
+		if (!fs.existsSync(destinationFolder)) {
+			fs.mkdirSync(destinationFolder);
+		}
 
 		var backupFilePath = path.join(destinationFolder, blobName + '.zip');
-		var writable = file_system.createWriteStream(backupFilePath);
+		var writable = fs.createWriteStream(backupFilePath);
 		var archive = archiver('zip');
 
 		writable.on('close', function () {
@@ -18,16 +22,11 @@ module.exports = {
 			throw err;
 		});
 
-		try {
-			archive.pipe(writable);
-			archive.bulk([
-			    { expand: true, cwd: sourceFolder, src: ['**'], dest: blobName}
-			]);
-			archive.finalize();
-		} catch (ex) {
-			callback(ex);
-			return;
-		}
+		archive.pipe(writable);
+		archive.bulk([
+		    { expand: true, cwd: sourceFolder, src: ['**'], dest: blobName }
+		]);
+		archive.finalize();
 
 		var result = {
 			backupFilePath: backupFilePath
