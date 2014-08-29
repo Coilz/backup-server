@@ -6,6 +6,15 @@ var config = require('app-config');
 var storageConfig = config.azure.storageAccount;
 var sourceConfig = config.dataSource;
 
+var removeFile = function(filePath) {
+	var fs = require('fs');
+	fs.unlink(filePath, function(error) {
+		if (error) {
+			console.log('Unlink error: ' + error);
+		}
+	});
+};
+
 var list = function(req, res, next) {
 };
 
@@ -18,27 +27,25 @@ var create = function(req, res, next) {
 
 	var addBlobCallbackHandler = function(error, addBlobResult, response) {
 		if (error){
-			res.send(error);
+			res.send('Add blob error: ' + error);
 			return;
 		}
 
-		// TODO: remove the zip-file or create backup in memory
+		removeFile(addBlobResult.filePath);
 		res.send(addBlobResult);
 	};
 
 	var zipFolderCallbackHandler = function(error, zipResult) {
 		if (error) {
-			res.send(error);
+			res.send('Zip error: ' + error);
 			return;
 		}
 
 		var client = new storageClient(storageConfig.name, storageConfig.key);
-		// client.addBlobFromLocalFile(storageConfig.container, blobName + '.zip', zipResult.backupFilePath, addBlobCallbackHandler);
-		client.addBlobFromBuffer(storageConfig.container, blobName + '.zip', zipResult.buffer, addBlobCallbackHandler);
+		client.addBlobFromLocalFile(storageConfig.container, blobName + '.zip', zipResult.backupFilePath, addBlobCallbackHandler);
 	};
 
-	// folderZip.zipToFile(sourceConfig.folder, './temp', blobName, zipFolderCallbackHandler);
-	folderZip.zipToBuffer(sourceConfig.folder, blobName, zipFolderCallbackHandler);
+	folderZip.zipToFile(sourceConfig.folder, './temp', blobName, zipFolderCallbackHandler);
 };
 
 var get = function(req, res, next) {

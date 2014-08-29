@@ -1,16 +1,29 @@
-var zip = require('adm-zip');
+var archiver = require('archiver');
 var path = require('path');
 
 module.exports = {
 	zipToFile : function(sourceFolder, destinationFolder, blobName, callback) {
-		var backupFilePath = path.join(destinationFolder, blobName + '.zip');
+		var file_system = require('fs');
 
-		console.log('folderZip.zipToFile call');
+		var backupFilePath = path.join(destinationFolder, blobName + '.zip');
+		var writable = file_system.createWriteStream(backupFilePath);
+		var archive = archiver('zip');
+
+		writable.on('close', function () {
+		    console.log(archive.pointer() + ' total bytes');
+		    console.log('archiver has been finalized and the writable file descriptor has closed.');
+		});
+
+		archive.on('error', function(err){
+			throw err;
+		});
 
 		try {
-			var zipper = new zip();
-			zipper.addLocalFolder(sourceFolder, blobName);
-			zipper.writeZip(backupFilePath);
+			archive.pipe(writable);
+			archive.bulk([
+			    { expand: true, cwd: sourceFolder, src: ['**'], dest: blobName}
+			]);
+			archive.finalize();
 		} catch (ex) {
 			callback(ex);
 			return;
@@ -21,28 +34,5 @@ module.exports = {
 		};
 
 		callback(null, result);
-	},
-	
-	zipToBuffer : function(sourceFolder, blobName, callback) {
-		var buffer;
-
-		console.log('folderZip.zipToBuffer call');
-
-		try {
-			var zipper = new zip();
-			zipper.addLocalFolder(sourceFolder, blobName);
-			buffer = zipper.toBuffer();
-		} catch (ex) {
-			callback(ex);
-			return;
-		}
-
-		var result = {
-			buffer: buffer
-		};
-
-		callback(null, result);
-	},
-
-	unzip : undefined
+	}
 }

@@ -25,16 +25,14 @@ module.exports = function(accountName, accountKey) {
 		},
 
 		addBlobFromLocalFile: function(containerName, blobName, filePath, callback) {
-			console.log('storageAccountClient.addBlobFromLocalFile call');
-
 			var createBlobCallbackHandler = function (error, result, response) {
+				result.filePath = filePath;
 				callback(error, result, response);
 			};
 
 			var createContainerIfNotExistsCallbackHandler = function (error, result, response) {
 				if (response.isSuccessful) {
 					blobService.createBlockBlobFromLocalFile(containerName, blobName, filePath, createBlobCallbackHandler);
-
 					return;
 				}
 
@@ -44,27 +42,14 @@ module.exports = function(accountName, accountKey) {
 			blobService.createContainerIfNotExists(containerName, createContainerIfNotExistsCallbackHandler);
 		},
 
-		addBlobFromBuffer: function(containerName, blobName, buffer, callback) {
-			console.log('storageAccountClient.addBlobFromBuffer call');
-
+		addBlobFromStream: function(containerName, blobName, stream, callback) {
 			var createBlobCallbackHandler = function (error, result, response) {
 				callback(error, result, response);
 			};
 
 			var createContainerIfNotExistsCallbackHandler = function (error, result, response) {
-				var streamBuffers = require("stream-buffers");
-
 				if (response.isSuccessful) {
-					console.log('storageAccountClient.addBlobFromBuffer streamBuffer');
-
-					var streamBuffer = new streamBuffers.ReadableStreamBuffer({
-					    frequency: 1,			// in milliseconds.
-					    chunkSize: 1024*1024*32	// in bytes.
-					});
-					streamBuffer.put(buffer);
-
-					blobService.createBlockBlobFromStream(containerName, blobName, streamBuffer, streamBuffer.size(), createBlobCallbackHandler);
-
+					blobService.createBlockBlobFromStream(containerName, blobName, stream, stream.size(), createBlobCallbackHandler);
 					return;
 				}
 
