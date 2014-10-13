@@ -1,5 +1,6 @@
 var storageClient = require('../services/azure/storageAccountClient');
 var folderZip = require('../services/folderZip');
+var fs = require('fs');
 var path = require('path');
 
 var config = require('app-config');
@@ -7,7 +8,6 @@ var storageConfig = config.azure.storageAccount;
 var sourceConfig = config.dataSource;
 
 var removeFile = function(filePath) {
-	var fs = require('fs');
 	fs.unlink(filePath, function(error) {
 		if (error) {
 			console.log('Unlink error: ' + error);
@@ -27,8 +27,7 @@ var create = function(req, res, next) {
 
 	function addBlobCallbackHandler(error, addBlobResult, response) {
 		if (error){
-			res.send('Add blob error: ' + error);
-			return;
+			throw error;
 		}
 
 		removeFile(addBlobResult.filePath);
@@ -37,8 +36,7 @@ var create = function(req, res, next) {
 
 	function zipFolderCallbackHandler(error, zipResult) {
 		if (error) {
-			res.send('Zip error: ' + error);
-			return;
+			throw error;
 		}
 
 		var client = new storageClient(storageConfig.name, storageConfig.key);

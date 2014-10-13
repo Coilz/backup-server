@@ -7,7 +7,7 @@ var router = new routes(app);
 // Though not mandatory, error-handling middleware are typically defined very last, below any other app.use()
 app.use(function(err, req, res, next) {
 	console.error(err.stack);
-	res.status(500).send('Something broke!');
+	res.status(500).send({ error: err.message });
 });
 
 var server = app.listen(8080, function() {
